@@ -1,0 +1,75 @@
+{
+    "categories": [
+      {
+        "category": "Funds Transfer / RAAST",
+        "questions": [
+          {
+            "question": "Is there a limit on the amount I can transfer through the mobile banking app?",
+            "answer": "Yes, 1 million is the current daily limit. Transfer limits vary based on your account type. Check the “Limits” section in the app for specifics on daily transfer limits."
+        
+          },
+          {
+            "question": "How can I change limit of funds transfer?",
+            "answer": "To change your funds, transfer limit, go to the “My profile” section and select “Manage Limit” in the app, then select “Change FT/IBFT” limits."
+          },
+          {
+            "question": "How can I add or update beneficiaries/ recipients of mobile banking app for funds transfer?",
+            "answer": "In the app, navigate to the “Transfer Funds” section and select “New Beneficiaries.” Here, you can choose to add a new beneficiary by entering their details or update existing beneficiary information."
+          },
+          {
+            "question": "How do I perform international transactions through mobile app?",
+            "answer": "One can enable international transactions by tapping on card management, select manage debit card and choose “international tranx activation” option."
+          },
+          {
+            "question": "Does the app support contactless payments or digital wallets?",
+            "answer": "For contactless payments NUST Bank has a separate mobile app named as NUST Digital Wallets. Customers can download and perform payments."
+          }
+        ]
+      },
+      {
+        "category": "App Features / Functionalities",
+        "questions": [
+          {
+            "question": "Can I use the mobile app while I am overseas?",
+            "answer": "Yes, the NUST mobile app can be accessed globally. Ensure you have internet connectivity and your registered mobile number is active for OTPs if required."
+          },
+          {
+            "question": "What should I do if I forget my login password?",
+            "answer": "Tap on 'Forgot Password' on the login screen. Follow the steps to reset your password using your registered mobile number and verification details."
+          },
+          {
+            "question": "Can I reset my MPIN through the app?",
+            "answer": "Yes, after logging into the app, go to 'Profile' \u2192 'Change MPIN' and follow the prompts to reset your MPIN securely."
+          },
+          {
+            "question": "What services are available under Bill Payment option?",
+            "answer": "You can pay utility bills, internet and mobile bills, and government fees using the 'Bill Payment' option in the app."
+          },
+          {
+            "question": "How can I recharge mobile balance or buy top-up?",
+            "answer": "Use the 'Mobile Top-Up' feature. Select your network, enter the mobile number and amount, and confirm with your MPIN."
+          },
+          {
+            "question": "Is biometric login supported in the app?",
+            "answer": "Yes, biometric login is supported. You can enable it under the 'Profile' section by turning on 'Fingerprint Login' for faster and secure access."
+          },
+          {
+            "question": "Can I view my debit card details using the mobile app?",
+            "answer": "You can view basic card details like the card status and activation options. For full card info, please contact the bank for security reasons."
+          },
+          {
+            "question": "How can I report an issue or give feedback within the app?",
+            "answer": "Go to the 'Contact Us' or 'Feedback' section in the app and submit your query or feedback. You can also email support@NUSTbank.com.pk."
+          },
+          {
+            "question": "How can I deactivate or delete my mobile banking account?",
+            "answer": "For security reasons, deactivation or deletion requests must be submitted by calling the helpline at +92 (51) 111 000 494."
+          },
+          {
+            "question": "Is the mobile app available in multiple languages?",
+            "answer": "Currently, the NUST mobile app supports English only. Multilingual support is being considered for future updates."
+          }
+        ]
+      }
+    ]
+  }
