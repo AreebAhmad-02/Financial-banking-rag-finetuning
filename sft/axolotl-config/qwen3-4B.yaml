@@ -1,0 +1,283 @@
+base_model: Qwen/Qwen3-4B
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+trust_remote_code: true
+
+dataset_prepared_path: null
+datasets:
+  - path: yuvraj17/alpaca_dataset
+    type: alpaca
+debug: null
+pad_to_sequence_len: true
+
+adapter: qlora
+bf16: auto
+tf32: false
+fp16: null
+load_in_4bit: true
+load_in_8bit: false
+
+flash_attention: true
+xformers_attention: null
+
+early_stopping_patience: null
+eval_table_size: null
+evals_per_epoch: null
+
+gradient_accumulation_steps: 4
+gradient_checkpointing: true
+group_by_length: false
+learning_rate: 2.0e-05
+
+lora_fan_in_fan_out: null
+lora_model_dir: null
+local_rank: null
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+logging_steps: 1
+lora_target_linear: true
+lora_target_modules:
+  - ^lm_head.weight$
+  - ^model.embed_tokens.weight$
+  # input_layernorm layers
+  - layers.0.input_layernorm
+  - layers.1.input_layernorm
+  - layers.2.input_layernorm
+  - layers.3.input_layernorm
+  - layers.4.input_layernorm
+  - layers.5.input_layernorm
+  - layers.6.input_layernorm
+  - layers.7.input_layernorm
+  - layers.8.input_layernorm
+  - layers.9.input_layernorm
+  - layers.10.input_layernorm
+  - layers.11.input_layernorm
+  - layers.12.input_layernorm
+  - layers.13.input_layernorm
+  - layers.14.input_layernorm
+  - layers.15.input_layernorm
+  - layers.16.input_layernorm
+  - layers.17.input_layernorm
+  # lm_head layers
+  # mlp.down_proj layers
+  - layers.4.mlp.down_proj
+  - layers.5.mlp.down_proj
+  - layers.35.mlp.down_proj
+  - layers.6.mlp.down_proj
+  - layers.10.mlp.down_proj
+  - layers.25.mlp.down_proj
+  - layers.7.mlp.down_proj
+  - layers.24.mlp.down_proj
+  - layers.13.mlp.down_proj
+  - layers.34.mlp.down_proj
+  - layers.11.mlp.down_proj
+  - layers.27.mlp.down_proj
+  - layers.9.mlp.down_proj
+  - layers.26.mlp.down_proj
+  - layers.8.mlp.down_proj
+  - layers.14.mlp.down_proj
+  - layers.33.mlp.down_proj
+  - layers.0.mlp.down_proj
+  # mlp.gate_proj layers
+  - layers.35.mlp.gate_proj
+  - layers.34.mlp.gate_proj
+  - layers.33.mlp.gate_proj
+  - layers.8.mlp.gate_proj
+  - layers.32.mlp.gate_proj
+  - layers.7.mlp.gate_proj
+  - layers.31.mlp.gate_proj
+  - layers.6.mlp.gate_proj
+  - layers.30.mlp.gate_proj
+  - layers.28.mlp.gate_proj
+  - layers.25.mlp.gate_proj
+  - layers.26.mlp.gate_proj
+  - layers.27.mlp.gate_proj
+  - layers.13.mlp.gate_proj
+  - layers.29.mlp.gate_proj
+  - layers.14.mlp.gate_proj
+  - layers.21.mlp.gate_proj
+  - layers.15.mlp.gate_proj
+  # mlp.up_proj layers
+  - layers.9.mlp.up_proj
+  - layers.10.mlp.up_proj
+  - layers.7.mlp.up_proj
+  - layers.8.mlp.up_proj
+  - layers.6.mlp.up_proj
+  - layers.5.mlp.up_proj
+  - layers.11.mlp.up_proj
+  - layers.14.mlp.up_proj
+  - layers.13.mlp.up_proj
+  - layers.4.mlp.up_proj
+  - layers.12.mlp.up_proj
+  - layers.15.mlp.up_proj
+  - layers.25.mlp.up_proj
+  - layers.27.mlp.up_proj
+  - layers.26.mlp.up_proj
+  - layers.28.mlp.up_proj
+  - layers.33.mlp.up_proj
+  - layers.17.mlp.up_proj
+  # model.embed_tokens layers
+  # model.norm layers
+  # post_attention_layernorm layers
+  - layers.0.post_attention_layernorm
+  - layers.1.post_attention_layernorm
+  - layers.2.post_attention_layernorm
+  - layers.3.post_attention_layernorm
+  - layers.4.post_attention_layernorm
+  - layers.5.post_attention_layernorm
+  - layers.6.post_attention_layernorm
+  - layers.7.post_attention_layernorm
+  - layers.8.post_attention_layernorm
+  - layers.9.post_attention_layernorm
+  - layers.10.post_attention_layernorm
+  - layers.11.post_attention_layernorm
+  - layers.12.post_attention_layernorm
+  - layers.13.post_attention_layernorm
+  - layers.14.post_attention_layernorm
+  - layers.15.post_attention_layernorm
+  - layers.16.post_attention_layernorm
+  - layers.17.post_attention_layernorm
+  # self_attn.k_norm layers
+  - layers.0.self_attn.k_norm
+  - layers.1.self_attn.k_norm
+  - layers.2.self_attn.k_norm
+  - layers.3.self_attn.k_norm
+  - layers.4.self_attn.k_norm
+  - layers.5.self_attn.k_norm
+  - layers.6.self_attn.k_norm
+  - layers.7.self_attn.k_norm
+  - layers.8.self_attn.k_norm
+  - layers.9.self_attn.k_norm
+  - layers.10.self_attn.k_norm
+  - layers.11.self_attn.k_norm
+  - layers.12.self_attn.k_norm
+  - layers.13.self_attn.k_norm
+  - layers.14.self_attn.k_norm
+  - layers.15.self_attn.k_norm
+  - layers.16.self_attn.k_norm
+  - layers.17.self_attn.k_norm
+  # self_attn.k_proj layers
+  - layers.30.self_attn.k_proj
+  - layers.25.self_attn.k_proj
+  - layers.27.self_attn.k_proj
+  - layers.28.self_attn.k_proj
+  - layers.6.self_attn.k_proj
+  - layers.35.self_attn.k_proj
+  - layers.10.self_attn.k_proj
+  - layers.8.self_attn.k_proj
+  - layers.26.self_attn.k_proj
+  - layers.4.self_attn.k_proj
+  - layers.21.self_attn.k_proj
+  - layers.0.self_attn.k_proj
+  - layers.31.self_attn.k_proj
+  - layers.11.self_attn.k_proj
+  - layers.29.self_attn.k_proj
+  - layers.32.self_attn.k_proj
+  - layers.7.self_attn.k_proj
+  - layers.9.self_attn.k_proj
+  # self_attn.o_proj layers
+  - layers.25.self_attn.o_proj
+  - layers.29.self_attn.o_proj
+  - layers.26.self_attn.o_proj
+  - layers.28.self_attn.o_proj
+  - layers.30.self_attn.o_proj
+  - layers.27.self_attn.o_proj
+  - layers.31.self_attn.o_proj
+  - layers.23.self_attn.o_proj
+  - layers.14.self_attn.o_proj
+  - layers.8.self_attn.o_proj
+  - layers.32.self_attn.o_proj
+  - layers.13.self_attn.o_proj
+  - layers.21.self_attn.o_proj
+  - layers.2.self_attn.o_proj
+  - layers.11.self_attn.o_proj
+  - layers.12.self_attn.o_proj
+  - layers.3.self_attn.o_proj
+  - layers.15.self_attn.o_proj
+  # self_attn.q_norm layers
+  - layers.0.self_attn.q_norm
+  - layers.1.self_attn.q_norm
+  - layers.2.self_attn.q_norm
+  - layers.3.self_attn.q_norm
+  - layers.4.self_attn.q_norm
+  - layers.5.self_attn.q_norm
+  - layers.6.self_attn.q_norm
+  - layers.7.self_attn.q_norm
+  - layers.8.self_attn.q_norm
+  - layers.9.self_attn.q_norm
+  - layers.10.self_attn.q_norm
+  - layers.11.self_attn.q_norm
+  - layers.12.self_attn.q_norm
+  - layers.13.self_attn.q_norm
+  - layers.14.self_attn.q_norm
+  - layers.15.self_attn.q_norm
+  - layers.16.self_attn.q_norm
+  - layers.17.self_attn.q_norm
+  # self_attn.q_proj layers
+  - layers.27.self_attn.q_proj
+  - layers.28.self_attn.q_proj
+  - layers.30.self_attn.q_proj
+  - layers.32.self_attn.q_proj
+  - layers.25.self_attn.q_proj
+  - layers.31.self_attn.q_proj
+  - layers.6.self_attn.q_proj
+  - layers.26.self_attn.q_proj
+  - layers.29.self_attn.q_proj
+  - layers.7.self_attn.q_proj
+  - layers.10.self_attn.q_proj
+  - layers.34.self_attn.q_proj
+  - layers.12.self_attn.q_proj
+  - layers.16.self_attn.q_proj
+  - layers.22.self_attn.q_proj
+  - layers.8.self_attn.q_proj
+  - layers.5.self_attn.q_proj
+  - layers.19.self_attn.q_proj
+  # self_attn.v_proj layers
+  - layers.22.self_attn.v_proj
+  - layers.25.self_attn.v_proj
+  - layers.30.self_attn.v_proj
+  - layers.10.self_attn.v_proj
+  - layers.23.self_attn.v_proj
+  - layers.34.self_attn.v_proj
+  - layers.35.self_attn.v_proj
+  - layers.27.self_attn.v_proj
+  - layers.6.self_attn.v_proj
+  - layers.28.self_attn.v_proj
+  - layers.24.self_attn.v_proj
+  - layers.14.self_attn.v_proj
+  - layers.0.self_attn.v_proj
+  - layers.11.self_attn.v_proj
+  - layers.8.self_attn.v_proj
+  - layers.19.self_attn.v_proj
+  - layers.26.self_attn.v_proj
+  - layers.4.self_attn.v_proj
+
+lr_scheduler: cosine
+num_epochs: 1
+micro_batch_size: 4
+optimizer: paged_adamw_32bit
+output_dir: ./outputs/Qwen3-4B
+
+resume_from_checkpoint: null
+sample_packing: null
+save_steps: null
+save_strategy: null
+saves_per_epoch: null
+sequence_len: 4000
+special_tokens:
+  pad_token: <|endoftext|>
+strict: false
+train_on_inputs: false
+val_set_size: 0.001
+deepspeed: deepspeed_configs/zero2.json
+fsdp: null
+fsdp_config: null
+
+wandb_entity: null
+wandb_log_model: null
+wandb_name: null
+wandb_project: qwen3-4B-FBR
+wandb_watch: null
+warmup_steps: 20
+weight_decay: 0.0
