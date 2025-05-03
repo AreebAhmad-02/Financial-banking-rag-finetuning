@@ -1,0 +1,9 @@
+langchain
+pandas
+openpyxl
+pydantic
+langchain-core
+langsmith
+SQLAlchemy
+requests
+PyYAML 
