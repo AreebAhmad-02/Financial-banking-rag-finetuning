@@ -5,7 +5,7 @@ trust_remote_code: true
 
 dataset_prepared_path: null
 datasets:
-  - path: yuvraj17/alpaca_dataset
+  - path: yuvraj17/banking-qa-dataset
     type: alpaca
 debug: null
 pad_to_sequence_len: true
@@ -38,8 +38,7 @@ lora_dropout: 0.05
 logging_steps: 1
 lora_target_linear: true
 lora_target_modules:
-  - ^lm_head.weight$
-  - ^model.embed_tokens.weight$
+  - lm_head.weight
   # input_layernorm layers
   - layers.0.input_layernorm
   - layers.1.input_layernorm
