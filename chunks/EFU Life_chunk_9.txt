@@ -1,0 +1,3 @@
+NaN            - In case of early termination, only Cash Value of policy will be payable to customer (current market rate of Mutual funds units will be reimbursed)                                                 NaN         NaN         NaN        NaN
+        NaN        - Cancellation of policy and full refund option is available if policy documents returned during Free Lookup Period i.e. 14 days of receipt of documents                                                 NaN         NaN         NaN        NaN
+        NaN               - Cash Values of policy may be differ from the tentaive returns provided on illustration document (illustration document is only for information)                                                 NaN         NaN         NaN        NaN

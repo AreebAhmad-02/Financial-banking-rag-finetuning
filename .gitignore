@@ -19,5 +19,3 @@ build/
 ~$*.xlsx
 ~$*.xls
 
-# Chunks directory (output of our script)
-chunks/ 
