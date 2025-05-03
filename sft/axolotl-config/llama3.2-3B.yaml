@@ -1,0 +1,166 @@
+base_model: meta-llama/Llama-3.2-3B-Instruct
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+adapter: qlora
+bf16: auto
+fp16: null
+load_in_4bit: true
+load_in_8bit: false
+dataset_prepared_path: null
+datasets:
+  - path: yuvraj17/banking-qa-dataset
+    type: alpaca
+debug: null
+deepspeed: deepspeed_configs/zero2.json
+early_stopping_patience: null
+eval_table_size: null
+evals_per_epoch: null
+flash_attention: true
+fsdp: null
+fsdp_config: null
+gradient_accumulation_steps: 4
+gradient_checkpointing: true
+group_by_length: false
+learning_rate: 2.0e-05
+local_rank: null
+logging_steps: 1
+lora_alpha: 32
+lora_dropout: 0.05
+lora_fan_in_fan_out: null
+lora_model_dir: null
+lora_r: 16
+lora_target_linear: true
+lora_target_modules:
+  # input_layernorm layers
+  # lm_head layers
+  # mlp.down_proj layers
+  - layers.0.mlp.down_proj
+  - layers.1.mlp.down_proj
+  - layers.17.mlp.down_proj
+  - layers.19.mlp.down_proj
+  - layers.18.mlp.down_proj
+  - layers.20.mlp.down_proj
+  - layers.5.mlp.down_proj
+  - layers.4.mlp.down_proj
+  - layers.2.mlp.down_proj
+  - layers.6.mlp.down_proj
+  - layers.3.mlp.down_proj
+  - layers.16.mlp.down_proj
+  - layers.15.mlp.down_proj
+  - layers.13.mlp.down_proj
+  # mlp.gate_proj layers
+  - layers.0.mlp.gate_proj
+  - layers.1.mlp.gate_proj
+  - layers.2.mlp.gate_proj
+  - layers.3.mlp.gate_proj
+  - layers.22.mlp.gate_proj
+  - layers.21.mlp.gate_proj
+  - layers.20.mlp.gate_proj
+  - layers.23.mlp.gate_proj
+  - layers.19.mlp.gate_proj
+  - layers.4.mlp.gate_proj
+  - layers.18.mlp.gate_proj
+  - layers.5.mlp.gate_proj
+  - layers.17.mlp.gate_proj
+  - layers.24.mlp.gate_proj
+  # mlp.up_proj layers
+  - layers.4.mlp.up_proj
+  - layers.3.mlp.up_proj
+  - layers.5.mlp.up_proj
+  - layers.6.mlp.up_proj
+  - layers.7.mlp.up_proj
+  - layers.2.mlp.up_proj
+  - layers.8.mlp.up_proj
+  - layers.14.mlp.up_proj
+  - layers.13.mlp.up_proj
+  - layers.11.mlp.up_proj
+  - layers.9.mlp.up_proj
+  - layers.1.mlp.up_proj
+  - layers.15.mlp.up_proj
+  - layers.12.mlp.up_proj
+  # model.embed_tokens layers
+  # model.norm layers
+  # post_attention_layernorm layers
+  # self_attn.k_proj layers
+  - layers.25.self_attn.k_proj
+  - layers.22.self_attn.k_proj
+  - layers.19.self_attn.k_proj
+  - layers.24.self_attn.k_proj
+  - layers.20.self_attn.k_proj
+  - layers.17.self_attn.k_proj
+  - layers.23.self_attn.k_proj
+  - layers.18.self_attn.k_proj
+  - layers.21.self_attn.k_proj
+  - layers.27.self_attn.k_proj
+  - layers.10.self_attn.k_proj
+  - layers.15.self_attn.k_proj
+  - layers.26.self_attn.k_proj
+  - layers.16.self_attn.k_proj
+  # self_attn.o_proj layers
+  - layers.13.self_attn.o_proj
+  - layers.7.self_attn.o_proj
+  - layers.12.self_attn.o_proj
+  - layers.5.self_attn.o_proj
+  - layers.21.self_attn.o_proj
+  - layers.10.self_attn.o_proj
+  - layers.6.self_attn.o_proj
+  - layers.19.self_attn.o_proj
+  - layers.8.self_attn.o_proj
+  - layers.20.self_attn.o_proj
+  - layers.22.self_attn.o_proj
+  - layers.9.self_attn.o_proj
+  - layers.17.self_attn.o_proj
+  - layers.11.self_attn.o_proj
+  # self_attn.q_proj layers
+  - layers.12.self_attn.q_proj
+  - layers.13.self_attn.q_proj
+  - layers.9.self_attn.q_proj
+  - layers.8.self_attn.q_proj
+  - layers.10.self_attn.q_proj
+  - layers.14.self_attn.q_proj
+  - layers.11.self_attn.q_proj
+  - layers.15.self_attn.q_proj
+  - layers.26.self_attn.q_proj
+  - layers.6.self_attn.q_proj
+  - layers.25.self_attn.q_proj
+  - layers.16.self_attn.q_proj
+  - layers.5.self_attn.q_proj
+  - layers.7.self_attn.q_proj
+  # self_attn.v_proj layers
+  - layers.23.self_attn.v_proj
+  - layers.14.self_attn.v_proj
+  - layers.15.self_attn.v_proj
+  - layers.19.self_attn.v_proj
+  - layers.3.self_attn.v_proj
+  - layers.18.self_attn.v_proj
+  - layers.25.self_attn.v_proj
+  - layers.4.self_attn.v_proj
+  - layers.17.self_attn.v_proj
+  - layers.20.self_attn.v_proj
+  - layers.22.self_attn.v_proj
+  - layers.13.self_attn.v_proj
+  - layers.5.self_attn.v_proj
+  - layers.27.self_attn.v_proj
+  - lm.head
+lr_scheduler: cosine
+micro_batch_size: 2
+num_epochs: 1
+optimizer: paged_adamw_32bit
+output_dir: ./outputs/LlaMA-3.2-3B-Instruct
+pad_to_sequence_len: true
+resume_from_checkpoint: null
+sample_packing: null
+save_steps: null
+save_strategy: null
+saves_per_epoch: null
+sequence_len: 4000
+special_tokens:
+  pad_token: <|eot_id|>
+strict: false
+tf32: false
+train_on_inputs: false
+trust_remote_code: true
+val_set_size: 0.001
+warmup_steps: 20
+weight_decay: 0.0
+xformers_attention: null
