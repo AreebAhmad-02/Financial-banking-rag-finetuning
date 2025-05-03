@@ -1,19 +1,47 @@
-# Financial-banking-rag-finetuning
+# Financial Banking RAG Finetuning
 
-## Excel Chunker
+A simple tool for processing financial banking Excel data into text chunks for RAG systems.
 
-Excel Chunker is a tool to process Excel files containing financial/banking information and split them into chunks for RAG (Retrieval-Augmented Generation) systems.
+## Project Structure
 
-### Usage
-
-To chunk Excel files using the header-based method:
-
-```bash
-python excel_chunker.py "dataset/NUST Bank-Product-Knowledge.xlsx" --chunk-method header
+```
+.
+├── dataset/                # Data files
+│   └── NUST Bank-Product-Knowledge.xlsx
+├── chunks/                 # Output chunks
+│   ├── character/          # Character-based chunks
+│   ├── header/             # Header-based chunks
+│   └── qa_pairs/           # Question-answer chunks
+├── excel_chunker.py        # Main chunking script
+├── requirements.txt        # Dependencies
+└── README.md               # Documentation
 ```
 
-### Available Chunking Methods
+## Quick Start
 
-- `header`: Chunks text based on headers in the document (best for structured documents)
-- `character`: Splits text into chunks of a specified size (default: 1000 characters)
-- `qa_pairs`: Extracts question-answer pairs from the data
+1. Set up environment:
+
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate    # Windows
+   pip install -r requirements.txt
+   ```
+
+2. Run chunker:
+
+   ```bash
+   # Header-based chunking
+   python excel_chunker.py "dataset/NUST Bank-Product-Knowledge.xlsx" --chunk-method header
+
+   # Character-based chunking
+   python excel_chunker.py "dataset/NUST Bank-Product-Knowledge.xlsx" --chunk-method character
+
+   # Question-answer pairs
+   python excel_chunker.py "dataset/NUST Bank-Product-Knowledge.xlsx" --chunk-method qa_pairs
+   ```
+
+## Chunking Methods
+
+- **header**: Splits by document headers (best for structured documents)
+- **character**: Splits by character count (default: 1000 chars, 200 overlap)
+- **qa_pairs**: Extracts question-answer pairs
