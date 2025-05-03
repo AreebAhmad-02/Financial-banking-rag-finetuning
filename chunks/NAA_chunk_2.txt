@@ -1,4 +1,0 @@
-NaN                                                                                                                                                       What is the account type of NAA?                 NaN          NaN
-        NaN                                                                                                                                            NAA can be opened both in Current & Savings                 NaN          NaN
-        NaN                                                                                                                            What is the opening and minimum balance requirement in NAA?                 NaN          NaN
-        NaN                                                                                                        Account can be opened with Rs.100/ and there is No minimum balance requirement.                 NaN          NaN

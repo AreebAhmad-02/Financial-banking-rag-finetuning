@@ -1,0 +1,52 @@
+Header 2: Unnamed: 1 Unnamed: 3 Unnamed: 4 Unnamed: 5 Unnamed: 6 Unnamed: 7 Unnamed: 8
+
+Indicative Profit Rates
+(For Conventional Deposit Products on “Per Annum” basis)
+Effective July 1st, 2024
+SAVINGS ACCOUNTS TERM DEPOSITS
+Change
+NUST Asaan Account  Short Notice Deposit Receipt (SNDR)
+Profit Payment Profit Rate  Tenor Payout Profit Rate
+Semi-Annually 0.19 7 Days Maturity 0.165
+29 Days 0.165
+PLS Savings
+Profit Payment Profit Rate  Term Deposits
+Semi-Annually 0.19 Tenor Payout Profit Rate
+One Month Maturity 0.17
+Little Champs Account  Two Months 0.17
+Profit Payment Profit Rate  Three Months 0.17
+Semi-Annually 0.19 Six Months 0.17
+One Year 0.175
+NUST Special Deposit Account (ASDA) Two Years 0.155
+Profit Payment Profit Rate  Three Years 0.15
+Monthly/Semi-Annually 0.19 Five Years  0.14
+NUST Waqaar Account - Senior Citizen Term Deposits
+Profit Payment Profit Rate  Tenor Payout Profit Rate
+Monthly 0.19 Three Months Monthly 0.16
+Six Months Monthly 0.16
+PakWatan Remittance Account Six Months Quarterly 0.1625
+Profit Payment Profit Rate
+Monthly 0.19 NUST Waqaar Account - Senior Citizen - Term Deposit
+Tenor Payout Profit Rate
+NUST Sahar Savings Account One Year Monthly 0.1675
+Profit Payment Profit Rate
+Monthly 0.19 NUST Bachat Account -Individual/Corporate and                                                                                                                                                                                                                                      Value Plus Term Deposit*
+NUST Maximiser Savings Account Tenor Payout Profit Rate
+Profit Payment Profit Rate  One Year Monthly 0.15
+Monthly 0.19 Two Years Monthly/ Quarterly/ Annual 0.13
+Quarterly 0.1905  *Discontinued - No Fresh Booking Allowed
+Semi-Annually 0.191
+Annually 0.1915 NUST Maximiser - Term Deposit
+Tenor Payout Profit Rate
+PLS Pensioners Account One Year Monthly 0.1675
+Profit Payment Profit Rate  Two Years 0.1425
+Semi-Annually 0.1925 Three Years 0.13752
+Five Years 0.13
+NUST Sahar - Term Deposit
+Tenor Payout Profit Rate
+One Year Monthly 0.17
+Three Years 0.14
+Five Years 0.1325
+FCY USD GBP EUR
+Savings Account 0.0025 0.0025 0
+Term Deposits  0.0025 0.0025 0
