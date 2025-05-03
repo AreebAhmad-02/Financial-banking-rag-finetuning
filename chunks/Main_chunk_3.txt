@@ -1,4 +1,0 @@
-NaN                                                               7               RDA Digital Customer Onboarding          NaN                    2                                     NUST Imarat Finance
-        NaN                                                               8                  Current Deposit Account (CDA)         NaN                    3                                      NUST Ujala Finance
-        NaN                                                               9 Value Plus Current Account (Individual) (VPCA)         NaN                    4                                 NUST Flour Mill Finance
-        NaN                                                              10            Value Plus Business Account (VP-BA)         NaN                    5                             NUST Fauri Business Finance

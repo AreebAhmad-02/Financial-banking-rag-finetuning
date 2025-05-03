@@ -1,4 +1,0 @@
-NaN                                                                                                     o   Bankers Cheque Issuance                           NaN Profit Payment         NaN        NaN
-        NaN                                                                                                                o   CDR Issuance                           NaN        Monthly        0.19        NaN
-        NaN                                                                        o  Inter Branch Online Cash Withdrawal/ Deposit (Online)                           NaN      Quarterly      0.1905        NaN
-        NaN                                                               o Internal Fund Transfer within NUST via branch (Online Transfer)                           NaN  Semi-Annually       0.191        NaN

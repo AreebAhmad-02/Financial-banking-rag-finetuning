@@ -1,1 +1,0 @@
-New Business\n20% equity.          NaN         NaN         NaN         NaN         NaN                               Existing Business\nNo equity, the existing investment in business will be considered as equity         NaN         NaN         NaN          NaN          NaN          NaN   NaN

@@ -1,5 +1,0 @@
-- Free Internal Fund Transfer within NUST via branch (Online Transfer)         NaN         NaN   NaN
-                                                                                                         - Free Banker’s Cheque Issuance         NaN         NaN   NaN
-                                                                                                                    - Free I-Net Banking         NaN         NaN   NaN
-                                                                                                                      - Free E-statement         NaN         NaN   NaN
-                                                                                               - Free SMS Alerts on digital transactions         NaN         NaN   NaN
