@@ -1,0 +1,69 @@
+base_model: Qwen/Qwen3-4B
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+trust_remote_code: true
+
+dataset_prepared_path: null
+datasets:
+  - path: yuvraj17/alpaca_dataset
+    type: alpaca
+debug: null
+pad_to_sequence_len: true
+
+adapter: qlora
+bf16: auto
+tf32: false
+fp16: null
+load_in_4bit: true
+load_in_8bit: false
+
+flash_attention: true
+xformers_attention: null
+
+early_stopping_patience: null
+eval_table_size: null
+evals_per_epoch: null
+
+gradient_accumulation_steps: 4
+gradient_checkpointing: true
+group_by_length: false
+learning_rate: 2.0e-05
+
+lora_fan_in_fan_out: null
+lora_model_dir: null
+local_rank: null
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+logging_steps: 1
+lora_target_linear: true
+lora_target_modules:
+
+lr_scheduler: cosine
+num_epochs: 1
+micro_batch_size: 4
+optimizer: paged_adamw_32bit
+output_dir: ./outputs/Qwen3-4B
+
+resume_from_checkpoint: null
+sample_packing: null
+save_steps: null
+save_strategy: null
+saves_per_epoch: null
+sequence_len: 4000
+special_tokens:
+  pad_token: <|endoftext|>
+strict: false
+train_on_inputs: false
+val_set_size: 0.001
+deepspeed: deepspeed_configs/zero2.json
+fsdp: null
+fsdp_config: null
+
+wandb_entity: null
+wandb_log_model: null
+wandb_name: null
+wandb_project: qwen3-4B-FBR
+wandb_watch: null
+warmup_steps: 20
+weight_decay: 0.0
