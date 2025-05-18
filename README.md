@@ -45,3 +45,25 @@ A simple tool for processing financial banking Excel data into text chunks for R
 - **header**: Splits by document headers (best for structured documents)
 - **character**: Splits by character count (default: 1000 chars, 200 overlap)
 - **qa_pairs**: Extracts question-answer pairs
+
+## Confiuring GuardRails:
+
+# Make sure to run requirements.txt
+
+```
+guardrails configure
+```
+
+Then login with the API KEY (Available in .env)
+Next, download the required Guardrails:
+
+```
+guardrails hub install hub://guardrails/detect_pii
+guardrails hub install hub://guardrails/detect_jailbreak
+guardrails hub install hub://guardrails/nsfw_text
+guardrails hub install hub://guardrails/toxic_language
+
+
+```
+
+And then do other things.. Will be adding soon.

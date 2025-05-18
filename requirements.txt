@@ -7,3 +7,5 @@ langsmith
 SQLAlchemy
 requests
 PyYAML 
+streamlit==1.45.0
+guardrails-ai==0.6.6
