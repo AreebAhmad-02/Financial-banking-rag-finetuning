@@ -1,5 +1,6 @@
 from typing import List, Dict, Optional
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+from hf_inference_client_embeddings import HFInferenceClientEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from langchain.retrievers import EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
@@ -22,7 +23,7 @@ from config import (
 )
 
 
-class   HybridRetriever:
+class HybridRetriever:
     def __init__(self, documents: Optional[List[Document]] = None, use_existing_collection: bool = False):
         """Initialize the hybrid retriever with documents.
 
@@ -37,17 +38,21 @@ class   HybridRetriever:
         print(documents[0])
         self.documents = documents or []
         # Initialize embeddings with Hugging Face Inference API
-        self.embeddings = HuggingFaceInferenceAPIEmbeddings(
+        # self.embeddings = HuggingFaceInferenceAPIEmbeddings(
+        #     api_key=HUGGINGFACE_API_TOKEN,
+        #     model_name=EMBEDDING_MODEL,
+        #     # api_url=EMBEDDING_API_URL,
+        #     # timeout=EMBEDDING_API_TIMEOUT,
+        #     # Ensures cosine similarity works well
+        #     # encode_kwargs={'normalize_embeddings': True}
+        # )
+        self.embeddings = HFInferenceClientEmbeddings(
             api_key=HUGGINGFACE_API_TOKEN,
             model_name=EMBEDDING_MODEL,
-            # api_url=EMBEDDING_API_URL,
-            # timeout=EMBEDDING_API_TIMEOUT,
-            # Ensures cosine similarity works well
-            # encode_kwargs={'normalize_embeddings': True}
         )
         print("initialized embeddings object")
         print(self.embeddings)
-        print("checking to test embedidings")
+        print("checking to test embeddings")
         print(self.embeddings.embed_query(documents[0].page_content))
         # Initialize vector store based on whether to use existing collection
         if use_existing_collection:
@@ -93,17 +98,20 @@ class   HybridRetriever:
             weights=[0.5, 0.5]
         )
 
-        # Add Cohere reranking
-        self.compressor = CohereRerank(
-            api_key=COHERE_API_KEY,
-            top_n=RERANK_TOP_N
-        )
+        # Create final retriever without reranking
+        self.retriever = self.ensemble_retriever
 
-        # Create final retriever with reranking
-        self.retriever = ContextualCompressionRetriever(
-            base_compressor=self.compressor,
-            base_retriever=self.ensemble_retriever
-        )
+        # # Add Cohere reranking
+        # self.compressor = CohereRerank(
+        #     api_key=COHERE_API_KEY,
+        #     top_n=RERANK_TOP_N
+        # )
+
+        # # Create final retriever with reranking
+        # self.retriever = ContextualCompressionRetriever(
+        #     base_compressor=self.compressor,
+        #     base_retriever=self.ensemble_retriever
+        # )
 
     def add_documents(self, documents: List[Document]) -> None:
         """Add new documents to both vector store and BM25 retriever."""
