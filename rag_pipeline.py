@@ -107,7 +107,7 @@ class RAGPipeline:
         # Initialize or update retriever
         if self.retriever is None:
             print("Initializing new retriever")
-            self.retriever = HybridRetriever(documents,use_existing_collection = False)
+            self.retriever = HybridRetriever(documents, use_existing_collection=True)
         else:
             # If you want to load an existing vector store, you can implement and call a load method here.
             # For now, just re-initialize the retriever with use_existing_collection=True
