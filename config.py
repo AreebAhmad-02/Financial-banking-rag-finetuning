@@ -16,6 +16,7 @@ EMBEDDING_API_URL = f"https://api-inference.huggingface.co/pipeline/feature-extr
 EMBEDDING_API_TIMEOUT = 30  # seconds
 
 # LLM Configuration
+LLM_PROVIDER = "together"
 LLM_MODEL = "meta-llama/Llama-3.2-3B-Instruct"
 LLM_API_URL = os.getenv("HUGGINGFACE_API_URL",
                         "https://api-inference.huggingface.co/models/" + LLM_MODEL)
