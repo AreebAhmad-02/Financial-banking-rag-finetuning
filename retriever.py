@@ -1,7 +1,8 @@
-from typing import List, Dict
-from langchain.embeddings import HuggingFaceInferenceAPIEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.retrievers import BM25Retriever, EnsembleRetriever
+from typing import List, Dict, Optional
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+from langchain_qdrant import QdrantVectorStore
+from langchain.retrievers import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
 from langchain.retrievers.document_compressors import CohereRerank
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.schema import Document
@@ -10,32 +11,67 @@ from config import (
     HUGGINGFACE_API_TOKEN,
     COHERE_API_KEY,
     EMBEDDING_MODEL,
+    EMBEDDING_API_URL,
+    EMBEDDING_API_TIMEOUT,
     TOP_K_MATCHES,
     RERANK_TOP_N,
-    VECTOR_STORE_PATH
+    QDRANT_HOST,
+    QDRANT_API_KEY,
+    QDRANT_COLLECTION_NAME,
+    QDRANT_PREFER_GRPC
 )
 
 
 class HybridRetriever:
-    def __init__(self, documents: List[Document]):
-        """Initialize the hybrid retriever with documents."""
-        self.documents = documents
+    def __init__(self, documents: Optional[List[Document]] = None, use_existing_collection: bool = False):
+        """Initialize the hybrid retriever with documents.
 
-        # Initialize embeddings
+        Args:
+            documents: Optional list of documents to add to the vector store
+            use_existing_collection: If True, will use an existing Qdrant collection instead of creating a new one
+        """
+        self.documents = documents or []
+
+        # Initialize embeddings with Hugging Face Inference API
         self.embeddings = HuggingFaceInferenceAPIEmbeddings(
             api_key=HUGGINGFACE_API_TOKEN,
-            model_name=EMBEDDING_MODEL
+            model_name=EMBEDDING_MODEL,
+            api_url=EMBEDDING_API_URL,
+            timeout=EMBEDDING_API_TIMEOUT,
+            # Ensures cosine similarity works well
+            encode_kwargs={'normalize_embeddings': True}
         )
 
-        # Initialize FAISS vector store
-        self.vector_store = FAISS.from_documents(
-            documents=self.documents,
-            embedding=self.embeddings
-        )
+        # Initialize vector store based on whether to use existing collection
+        if use_existing_collection:
+            # Connect to existing Qdrant Cloud collection
+            self.vector_store = QdrantVectorStore.from_existing_collection(
+                embedding=self.embeddings,
+                collection_name=QDRANT_COLLECTION_NAME,
+                url=QDRANT_HOST,
+                prefer_grpc=QDRANT_PREFER_GRPC,
+                api_key=QDRANT_API_KEY,
+            )
+        else:
+            # Create new collection in Qdrant Cloud
+            self.vector_store = QdrantVectorStore.from_documents(
+                documents=documents or [],
+                embedding=self.embeddings,
+                url=QDRANT_HOST,
+                prefer_grpc=QDRANT_PREFER_GRPC,
+                api_key=QDRANT_API_KEY,
+                collection_name=QDRANT_COLLECTION_NAME,
+                force_recreate=True  # This ensures collection is created even with empty documents
+            )
 
-        # Initialize BM25 retriever
-        self.bm25_retriever = BM25Retriever.from_documents(self.documents)
-        self.bm25_retriever.k = TOP_K_MATCHES
+        # Initialize BM25 retriever if documents are provided
+        if documents:
+            self.bm25_retriever = BM25Retriever.from_documents(self.documents)
+            self.bm25_retriever.k = TOP_K_MATCHES
+        else:
+            # Initialize with empty documents list
+            self.bm25_retriever = BM25Retriever.from_documents([])
+            self.bm25_retriever.k = TOP_K_MATCHES
 
         # Initialize vector store retriever
         self.vector_retriever = self.vector_store.as_retriever(
@@ -60,20 +96,25 @@ class HybridRetriever:
             base_retriever=self.ensemble_retriever
         )
 
-    def save_vector_store(self):
-        """Save the FAISS vector store to disk."""
-        self.vector_store.save_local(VECTOR_STORE_PATH)
+    def add_documents(self, documents: List[Document]) -> None:
+        """Add new documents to both vector store and BM25 retriever."""
+        if documents:
+            # Add to vector store
+            self.vector_store.add_documents(documents)
+
+            # Update BM25 retriever
+            self.bm25_retriever = BM25Retriever.from_documents(
+                self.documents + documents
+            )
+            self.bm25_retriever.k = TOP_K_MATCHES
+
+            # Update documents list
+            self.documents.extend(documents)
 
     @classmethod
-    def load_vector_store(cls, documents: List[Document]):
-        """Load a saved vector store from disk."""
-        instance = cls(documents)
-        embeddings = HuggingFaceInferenceAPIEmbeddings(
-            api_key=HUGGINGFACE_API_TOKEN,
-            model_name=EMBEDDING_MODEL
-        )
-        instance.vector_store = FAISS.load_local(VECTOR_STORE_PATH, embeddings)
-        return instance
+    def from_existing_collection(cls, documents: Optional[List[Document]] = None):
+        """Create a HybridRetriever instance using an existing Qdrant collection."""
+        return cls(documents=documents, use_existing_collection=True)
 
     def get_relevant_documents(self, query: str) -> List[Document]:
         """Get relevant documents for a query using the hybrid retrieval system."""

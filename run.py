@@ -7,20 +7,23 @@ def main():
     # Load environment variables
     load_dotenv()
 
-    # Get API endpoint
-    hf_api_url = os.getenv("HUGGINGFACE_API_URL")
-    if not hf_api_url:
-        raise ValueError("Please set HUGGINGFACE_API_URL in your .env file")
-
-    # Create pipeline
+    # Create pipeline with Qwen model
     print("Initializing RAG pipeline...")
-    pipeline = create_rag_pipeline(hf_api_url)
+    pipeline = create_rag_pipeline()
 
     # Ingest documents
     print("\nIngesting documents...")
+
+    # You can use either Excel file or JSON file
+    # For Excel:
+    # pipeline.ingest_documents(
+    #     excel_file="data/banking_info.xlsx",
+    #     chunk_method="header"
+    # )
+
+    # For JSON (uncomment if using JSON):
     pipeline.ingest_documents(
-        excel_file="data/banking_info.xlsx",  # Update this path to your Excel file
-        chunk_method="character"  # You can change to "qa_pairs" or "header"
+        json_file="chunks/header/all_chunks.json"
     )
 
     # Interactive query loop

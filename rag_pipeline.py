@@ -2,50 +2,106 @@
 
 import os
 from typing import List, Dict, Optional
+import json
+import requests
 from preprocessing.excel_chunker import process_excel_file
 from retriever import HybridRetriever
 from langchain.schema import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-import requests
-from config import HUGGINGFACE_API_TOKEN, DATA_DIR
+from config import (
+    HUGGINGFACE_API_TOKEN,
+    DATA_DIR,
+    LLM_API_URL,
+    MAX_NEW_TOKENS,
+    TEMPERATURE,
+    DO_SAMPLE,
+    REPETITION_PENALTY
+)
 
 
 class RAGPipeline:
-    def __init__(self, hf_api_url: str):
+    def __init__(self):
         """Initialize the RAG pipeline."""
-        self.hf_api_url = hf_api_url
         self.retriever = None
+
+        # Create prompt template
         self.prompt = ChatPromptTemplate.from_template("""
-        You are a helpful banking assistant. Use the following context to answer the question.
-        If you don't know the answer, just say you don't know. Don't try to make up an answer.
+        <|system|>
+        You are an AI Assistant that follows instructions extremely well. Based on the context below, answer the user's query.
+        Please be truthful and give direct answers. Please tell 'I don't know' if user query is not in CONTEXT
 
-        Context: {context}
+        CONTEXT: {context}
+        </s>
+        <|user|>
+        {query}
+        </s>
+        <|assistant|>
+        """)
 
-        Question: {question}
+    def query_llm(self, prompt: str) -> str:
+        """Query the Hugging Face Inference API."""
+        headers = {
+            "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}",
+            "Content-Type": "application/json"
+        }
 
-        Answer: """)
+        payload = {
+            "inputs": prompt,
+            "parameters": {
+                "max_new_tokens": MAX_NEW_TOKENS,
+                "temperature": TEMPERATURE,
+                "do_sample": DO_SAMPLE,
+                "repetition_penalty": REPETITION_PENALTY
+            }
+        }
 
-    def ingest_documents(self, excel_file: str, chunk_method: str = 'character') -> None:
-        """Process and ingest documents from an Excel file."""
-        # Process Excel file using the existing chunker
-        chunks_dict = process_excel_file(
-            excel_file=excel_file,
-            output_dir=DATA_DIR,
-            chunk_method=chunk_method,
-            save_as_json=True
-        )
+        try:
+            response = requests.post(
+                LLM_API_URL, headers=headers, json=payload)
+            response.raise_for_status()
+            return response.json()[0]["generated_text"]
+        except Exception as e:
+            print(f"Error querying LLM: {str(e)}")
+            return "I apologize, but I encountered an error while processing your request."
 
-        # Convert chunks to documents
+    def ingest_documents(self, excel_file: str = None, json_file: str = None, chunk_method: str = 'character') -> None:
+        """Process and ingest documents from either Excel file or JSON."""
         documents = []
-        for sheet_name, chunks in chunks_dict.items():
-            for chunk in chunks:
-                doc = Document(
-                    page_content=chunk,
-                    metadata={"source": sheet_name}
-                )
-                documents.append(doc)
+
+        if excel_file:
+            # Process Excel file using the existing chunker
+            chunks_dict = process_excel_file(
+                excel_file=excel_file,
+                output_dir=DATA_DIR,
+                chunk_method=chunk_method,
+                save_as_json=True
+            )
+
+            # Convert chunks to documents
+            for sheet_name, chunks in chunks_dict.items():
+                for chunk in chunks:
+                    doc = Document(
+                        page_content=chunk,
+                        metadata={"source": sheet_name}
+                    )
+                    documents.append(doc)
+
+        elif json_file:
+            # Load from JSON file
+            with open(json_file, 'r') as f:
+                all_chunks = json.load(f)
+
+            # Convert JSON chunks to documents
+            for key, value in all_chunks.items():
+                if value and isinstance(value, list):
+                    content = key + '\n' + value[0]
+                    doc = Document(
+                        page_content=content,
+                        metadata={"source": "json"}
+                    )
+                    documents.append(doc)
 
         # Initialize or update retriever
         if self.retriever is None:
@@ -56,26 +112,6 @@ class RAGPipeline:
         # Save vector store
         self.retriever.save_vector_store()
 
-    def query_llm(self, prompt: str) -> str:
-        """Query the Hugging Face model."""
-        headers = {
-            "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}",
-            "Content-Type": "application/json"
-        }
-        payload = {
-            "inputs": prompt,
-            "parameters": {"max_new_tokens": 512, "temperature": 0.7}
-        }
-
-        try:
-            response = requests.post(
-                self.hf_api_url, headers=headers, json=payload)
-            response.raise_for_status()
-            return response.json()[0]["generated_text"]
-        except Exception as e:
-            print(f"Error querying LLM: {str(e)}")
-            return "I apologize, but I encountered an error while processing your request."
-
     def get_response(self, query: str) -> str:
         """Get a response for a query using the RAG pipeline."""
         if self.retriever is None:
@@ -85,14 +121,11 @@ class RAGPipeline:
             # Get relevant context
             context = self.retriever.get_relevant_context(query)
 
-            # Create the chain
-            chain = {
-                "context": lambda x: context,
-                "question": lambda x: x
-            } | self.prompt | self.query_llm
+            # Format prompt
+            prompt = self.prompt.format(context=context, query=query)
 
-            # Get response
-            response = chain.invoke(query)
+            # Get response from LLM
+            response = self.query_llm(prompt)
             return response
 
         except Exception as e:
@@ -100,6 +133,6 @@ class RAGPipeline:
             return "I apologize, but I encountered an error while processing your request."
 
 
-def create_rag_pipeline(hf_api_url: str) -> RAGPipeline:
+def create_rag_pipeline() -> RAGPipeline:
     """Create and return a configured RAG pipeline."""
-    return RAGPipeline(hf_api_url)
+    return RAGPipeline()
