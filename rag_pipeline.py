@@ -89,6 +89,7 @@ class RAGPipeline:
                     documents.append(doc)
 
         elif json_file:
+            print(f"Loading chunks from {json_file}")
             # Load from JSON file
             with open(json_file, 'r') as f:
                 all_chunks = json.load(f)
@@ -105,7 +106,8 @@ class RAGPipeline:
 
         # Initialize or update retriever
         if self.retriever is None:
-            self.retriever = HybridRetriever(documents)
+            print("Initializing new retriever")
+            self.retriever = HybridRetriever(documents,use_existing_collection = False)
         else:
             self.retriever = HybridRetriever.load_vector_store(documents)
 

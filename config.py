@@ -10,7 +10,8 @@ COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 
 # Hugging Face Inference API Configuration
 # or "BAAI/bge-large-en-v1.5"
-EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
+# or sentence-transformers/all-mpnet-base-v2
+EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
 EMBEDDING_API_URL = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{EMBEDDING_MODEL}"
 EMBEDDING_API_TIMEOUT = 30  # seconds
 

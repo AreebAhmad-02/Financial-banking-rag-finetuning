@@ -18,11 +18,11 @@ from config import (
     QDRANT_HOST,
     QDRANT_API_KEY,
     QDRANT_COLLECTION_NAME,
-    QDRANT_PREFER_GRPC
+    # QDRANT_PREFER_GRPC
 )
 
 
-class HybridRetriever:
+class   HybridRetriever:
     def __init__(self, documents: Optional[List[Document]] = None, use_existing_collection: bool = False):
         """Initialize the hybrid retriever with documents.
 
@@ -30,39 +30,48 @@ class HybridRetriever:
             documents: Optional list of documents to add to the vector store
             use_existing_collection: If True, will use an existing Qdrant collection instead of creating a new one
         """
+        print("Initializing embeddings")
+        
+        print("length of documents",len(documents))
+        print("type of documents 0",type(documents[0].page_content))
+        print(documents[0])
         self.documents = documents or []
-
         # Initialize embeddings with Hugging Face Inference API
         self.embeddings = HuggingFaceInferenceAPIEmbeddings(
             api_key=HUGGINGFACE_API_TOKEN,
             model_name=EMBEDDING_MODEL,
-            api_url=EMBEDDING_API_URL,
-            timeout=EMBEDDING_API_TIMEOUT,
+            # api_url=EMBEDDING_API_URL,
+            # timeout=EMBEDDING_API_TIMEOUT,
             # Ensures cosine similarity works well
-            encode_kwargs={'normalize_embeddings': True}
+            # encode_kwargs={'normalize_embeddings': True}
         )
-
+        print("initialized embeddings object")
+        print(self.embeddings)
+        print("checking to test embedidings")
+        print(self.embeddings.embed_query(documents[0].page_content))
         # Initialize vector store based on whether to use existing collection
         if use_existing_collection:
+            print("using existing collection")
             # Connect to existing Qdrant Cloud collection
             self.vector_store = QdrantVectorStore.from_existing_collection(
                 embedding=self.embeddings,
                 collection_name=QDRANT_COLLECTION_NAME,
                 url=QDRANT_HOST,
-                prefer_grpc=QDRANT_PREFER_GRPC,
                 api_key=QDRANT_API_KEY,
             )
         else:
             # Create new collection in Qdrant Cloud
+            print("creating new collection")
+            
             self.vector_store = QdrantVectorStore.from_documents(
                 documents=documents or [],
                 embedding=self.embeddings,
                 url=QDRANT_HOST,
-                prefer_grpc=QDRANT_PREFER_GRPC,
+                prefer_grpc=True,
                 api_key=QDRANT_API_KEY,
                 collection_name=QDRANT_COLLECTION_NAME,
-                force_recreate=True  # This ensures collection is created even with empty documents
             )
+            
 
         # Initialize BM25 retriever if documents are provided
         if documents:
