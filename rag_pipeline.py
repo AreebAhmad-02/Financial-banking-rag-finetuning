@@ -109,10 +109,13 @@ class RAGPipeline:
             print("Initializing new retriever")
             self.retriever = HybridRetriever(documents,use_existing_collection = False)
         else:
-            self.retriever = HybridRetriever.load_vector_store(documents)
+            # If you want to load an existing vector store, you can implement and call a load method here.
+            # For now, just re-initialize the retriever with use_existing_collection=True
+            self.retriever = HybridRetriever(documents, use_existing_collection=True)
 
         # Save vector store
-        self.retriever.save_vector_store()
+        """If you are using Qdrant (local or remote), you typically do not need to manually save, as Qdrant persists data automatically. But to keep your code flow and avoid the error, you can add a dummy method:"""
+        # self.retriever.save_vector_store()
 
     def get_response(self, query: str) -> str:
         """Get a response for a query using the RAG pipeline."""
