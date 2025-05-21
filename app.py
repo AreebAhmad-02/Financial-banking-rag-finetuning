@@ -2,8 +2,9 @@ import json
 import streamlit as st
 from rag_pipeline import create_rag_pipeline
 from utils import extract_text_from_pdf, extract_text_from_docx, chunk_text_by_character
+from guardrail.guards import input_guard, output_guard, validate_with_guard
 
-st.set_page_config(page_title="Banking Support Assistant", page_icon="💼", layout="centered")
+st.set_page_config(page_title="NUST Banking Support Assistant", page_icon="💼", layout="centered")
 
 st.title("💼 Banking Support Assistant")
 st.subheader("Ask your banking-related questions below:")
@@ -84,72 +85,23 @@ with st.sidebar:
             st.success("Documents ingested into RAG pipeline.")
 
 
-# --- Sidebar Upload ---
-# with st.sidebar:
-#     st.header("📄 Upload Additional Documents")
-#     uploaded_files = st.file_uploader("Choose files", accept_multiple_files=True, type=['pdf', 'txt', 'docx'])
-#     # if uploaded_files:
-#     #     for file in uploaded_files:
-#     #         file_path = f"uploads/{file.name}"
-#     #         with open(file_path, "wb") as f:
-#     #             f.write(file.read())
-#     #     st.success("Files uploaded successfully!")
-#     #     if st.button("Ingest Documents"):
-#     #         # Placeholder for future: process and ingest uploaded files
-#     #         pipeline.ingest_documents(json_file="chunks/header/all_chunks.json")
-#     #         st.success("Documents ingested into RAG pipeline.")
-
-#     if uploaded_files:
-#         for file in uploaded_files:
-#             file_path = f"uploads/{file.name}"
-#             with open(file_path, "wb") as f:
-#                 f.write(file.read())
-#         st.success("Files uploaded successfully!")
-#         if st.button("Ingest Documents"):
-#             # Read and chunk each file
-#             new_chunks = {}
-#             for file in uploaded_files:
-#                 file_path = f"uploads/{file.name}"
-#                 if file.name.lower().endswith(".pdf"):
-#                     text = extract_text_from_pdf(file_path)
-#                 elif file.name.lower().endswith(".docx"):
-#                     text = extract_text_from_docx(file_path)
-#                 elif file.name.lower().endswith(".txt"):
-#                     with open(file_path, "r", encoding="utf-8") as f:
-#                         text = f.read()
-#                 else:
-#                     continue  # Skip unsupported file types
-
-#                 chunks = chunk_text_by_character(text)
-#                 new_chunks[file.name] = chunks
-
-#             # Load existing JSON
-#             json_path = "chunks/header/all_chunks.json"
-#             try:
-#                 with open(json_path, "r", encoding="utf-8") as f:
-#                     all_chunks = json.load(f)
-#             except (FileNotFoundError, json.JSONDecodeError):
-#                 all_chunks = {}
-
-#             # Append new chunks
-#             all_chunks.update(new_chunks)
-
-#             # Save back to JSON
-#             with open(json_path, "w", encoding="utf-8") as f:
-#                 json.dump(all_chunks, f, ensure_ascii=False, indent=2)
-
-#             # Ingest into pipeline
-#             pipeline.ingest_documents(json_file=json_path)
-#             st.success("Documents ingested into RAG pipeline.")
-
 # --- Main Query Input ---
 user_query = st.text_input("Enter your query:", placeholder="E.g., What are the requirements for a personal loan?")
 
 if st.button("Submit Query") and user_query.strip():
-    with st.spinner("Fetching response..."):
-        response = pipeline.get_response(user_query)
-        st.markdown("### 🧠 Response")
-        st.write(response)
+    with st.spinner("Validating your query..."):
+        validated_query = validate_with_guard(input_guard, user_query)
+    if not validated_query:
+        st.error("❌ Your query did not pass our safety checks. Please rephrase and try again.")
+    else:
+        with st.spinner("Fetching response..."):
+            response = pipeline.get_response(user_query)
+            validated_response = validate_with_guard(output_guard, response)
+        if not validated_response:
+            st.error("❌ The generated response did not pass our safety checks. Please try a different query.")
+        else:
+            st.markdown("### 🧠 Response")
+            st.write(response)
 else:
     st.info("Please enter a query to receive support.")
 

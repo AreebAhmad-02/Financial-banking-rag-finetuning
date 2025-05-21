@@ -267,5 +267,5 @@ Download Validators From GuardrailsHub:
 ```
 guardrails hub install hub://guardrails/regex_match
 guardrails hub install hub://guardrails/detect_jailbreak
-guardrails hub install hub://brainlogic/high_quality_translation
+guardrails hub install hub://guardrails/toxic_language
 ```
