@@ -4,6 +4,7 @@ import os
 from typing import List, Dict, Optional
 import json
 import requests
+from huggingface_hub import InferenceClient
 from preprocessing.excel_chunker import process_excel_file
 from retriever import HybridRetriever
 from langchain.schema import Document
@@ -13,11 +14,10 @@ from langchain_core.runnables import RunnablePassthrough
 from config import (
     HUGGINGFACE_API_TOKEN,
     DATA_DIR,
-    LLM_API_URL,
+    LLM_PROVIDER,
+    LLM_MODEL,
     MAX_NEW_TOKENS,
     TEMPERATURE,
-    DO_SAMPLE,
-    REPETITION_PENALTY
 )
 
 
@@ -25,6 +25,12 @@ class RAGPipeline:
     def __init__(self):
         """Initialize the RAG pipeline."""
         self.retriever = None
+
+        # Initialize InferenceClient for LLM
+        self.llm_client = InferenceClient(
+            provider=LLM_PROVIDER,
+            api_key=HUGGINGFACE_API_TOKEN,
+        )
 
         # Create prompt template
         self.prompt = ChatPromptTemplate.from_template("""
@@ -41,27 +47,21 @@ class RAGPipeline:
         """)
 
     def query_llm(self, prompt: str) -> str:
-        """Query the Hugging Face Inference API."""
-        headers = {
-            "Authorization": f"Bearer {HUGGINGFACE_API_TOKEN}",
-            "Content-Type": "application/json"
-        }
-
-        payload = {
-            "inputs": prompt,
-            "parameters": {
-                "max_new_tokens": MAX_NEW_TOKENS,
-                "temperature": TEMPERATURE,
-                "do_sample": DO_SAMPLE,
-                "repetition_penalty": REPETITION_PENALTY
-            }
-        }
-
+        """Query the LLM using InferenceClient."""
         try:
-            response = requests.post(
-                LLM_API_URL, headers=headers, json=payload)
-            response.raise_for_status()
-            return response.json()[0]["generated_text"]
+            completion = self.llm_client.chat.completions.create(
+                model=LLM_MODEL,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                max_tokens=MAX_NEW_TOKENS,
+                temperature=TEMPERATURE,
+                top_p=1.0
+            )
+            return completion.choices[0].message.content
         except Exception as e:
             print(f"Error querying LLM: {str(e)}")
             return "I apologize, but I encountered an error while processing your request."
@@ -107,7 +107,7 @@ class RAGPipeline:
         # Initialize or update retriever
         if self.retriever is None:
             print("Initializing new retriever")
-            self.retriever = HybridRetriever(documents,use_existing_collection = False)
+            self.retriever = HybridRetriever(documents, use_existing_collection=True)
         else:
             # If you want to load an existing vector store, you can implement and call a load method here.
             # For now, just re-initialize the retriever with use_existing_collection=True
