@@ -269,3 +269,82 @@ guardrails hub install hub://guardrails/regex_match
 guardrails hub install hub://guardrails/detect_jailbreak
 guardrails hub install hub://guardrails/toxic_language
 ```
+
+```
+guardrails configure
+```
+
+### 13. Running the Application
+
+#### 13.1 Environment Configuration
+
+- All sensitive credentials (API keys, endpoints) are managed via a `.env` file.
+- The `config.py` module loads these environment variables at runtime.
+- **Example `.env` file:**
+  ```
+  HUGGINGFACE_API_TOKEN=your_huggingface_token
+  COHERE_API_KEY=your_cohere_key
+  ```
+- **Note:** Never commit your `.env` file to version control.
+
+#### 13.2 Guardrails Setup
+
+- Ensure you have installed the required guardrails validators:
+  ```
+  pip install guardrails-ai
+  guardrails hub install hub://guardrails/regex_match
+  guardrails hub install hub://guardrails/detect_jailbreak
+  guardrails hub install hub://guardrails/toxic_language
+  ```
+- The guardrails are integrated in `guardrail/guards.py` and are automatically invoked for both input and output validation.
+
+```
+guardrails configure
+
+```
+
+#### 13.3 Running the Backend
+
+- Activate your virtual environment:
+  ```bash
+  source venv/bin/activate  # On Linux/Mac
+  venv\Scripts\activate     # On Windows
+  ```
+
+````
+
+- **(Optional)** Run the application:
+  ```bash
+  python run.py
+  ```
+- For the Streamlit frontend, run:
+  ```bash
+  streamlit run app.py
+  ```
+
+#### 13.4 Usage Notes
+
+- On startup, the system loads documents, builds the vector store, and prepares the retrieval pipeline.
+- All user queries and LLM responses are validated by guardrails for safety and compliance.
+- If a query or response fails validation, the user is prompted to revise their input.
+
+---
+
+**Make sure to:**
+
+- Configure your `.env` file with valid API keys.
+- Install all dependencies from `requirements.txt`.
+- Download and install the required guardrails validators before running the app.
+
+---
+
+**For any issues:**
+
+- Check your environment variables.
+- Review logs for error messages.
+- Ensure all guardrails validators are installed and up to date.
+
+```
+
+```
+````
