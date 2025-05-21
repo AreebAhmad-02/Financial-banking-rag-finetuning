@@ -8,7 +8,7 @@ def main():
     # Load environment variables
     load_dotenv()
 
-    # Create pipeline with Qwen model
+    # Create pipeline with model
     print("Initializing RAG pipeline...")
     pipeline = create_rag_pipeline()
 
