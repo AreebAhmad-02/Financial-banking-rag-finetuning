@@ -1,4 +1,5 @@
 from rag_pipeline import create_rag_pipeline
+from guardrail.guards import input_guard
 import os
 from dotenv import load_dotenv
 
@@ -34,7 +35,13 @@ def main():
             break
 
         print("\nProcessing query...")
+        # Before sending to LLM
+        validated_query = input_guard.validate(query)
+        print(f"Validated query: {validated_query}")
+
         response = pipeline.get_response(query)
+        # After getting LLM response
+        # validated_response = output_guard.validate(response)
         print(f"\nAnswer: {response}")
 
 

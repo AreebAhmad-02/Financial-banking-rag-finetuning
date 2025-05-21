@@ -255,3 +255,17 @@ pip install -r requirements.txt
 - Single language support
 - Sequential processing
 - Memory constraints with large datasets
+
+### Guardrails
+
+```
+pip install guardrails-ai
+```
+
+Download Validators From GuardrailsHub:
+
+```
+guardrails hub install hub://guardrails/regex_match
+guardrails hub install hub://guardrails/detect_jailbreak
+guardrails hub install hub://brainlogic/high_quality_translation
+```
