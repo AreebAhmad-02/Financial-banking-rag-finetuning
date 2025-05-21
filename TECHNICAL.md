@@ -123,10 +123,6 @@ huggingface-hub>=0.20.1
 * SFT (Supervised Fine-Tuning) configuration for `BankLlama-3B`
 * Tools and setup instructions
 
----
-
-# 🔐 RAG Application Configuration & Deployment Guide
-
 ## 5. Configuration Options
 
 ### 5.1 Model Settings
