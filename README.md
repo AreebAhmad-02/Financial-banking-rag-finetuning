@@ -15,7 +15,7 @@ A production-ready Retrieval-Augmented Generation (RAG) system for banking infor
   - Table preservation
   - Markdown formatting support
   - JSON export capability
-
+#### Alpaca Format Dataset for finetuning: https://huggingface.co/datasets/Areeb-02/banking-qa-dataset
 ### 2. Retrieval System (`retriever.py`)
 
 - **Purpose**: Implements a hybrid retrieval system combining multiple search strategies
