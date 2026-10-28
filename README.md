@@ -106,6 +106,7 @@ git clone https://github.com/AreebAhmad-02/Financial-banking-rag-finetuning.git
 cd Financial-banking-rag-finetuning
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
+pip install streamlit langchain-core
 ```
 
 **2. Configure.** Copy `example.env` to `.env` and fill in:
