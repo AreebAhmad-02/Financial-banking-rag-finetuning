@@ -51,7 +51,7 @@ Banking questions mix **meaning** ("how do I send money abroad?") with **exact t
 
 ## Fine-tuning: BankLlama-3B
 
-Alongside the RAG system, the base model was fine-tuned on a banking Q&A dataset (Alpaca format) built from the same documents (`preprocessing/SFT_banking_qa_formatter.py`).
+Alongside the RAG system, the base model was fine-tuned on a banking Q&A dataset (Alpaca format) built from the same documents (`preprocessing/SFT_banking_qa_formatter.py`) and published as [`Areeb-02/banking-qa-dataset`](https://huggingface.co/datasets/Areeb-02/banking-qa-dataset).
 
 ```mermaid
 flowchart LR
@@ -66,7 +66,7 @@ flowchart LR
 
 | Setting | Value |
 |---|---|
-| Base model | `meta-llama/Llama-3.2-3B-Instruct` (a Qwen3-4B config is also included) |
+| Base model | [`meta-llama/Llama-3.2-3B-Instruct`](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct) (a [`Qwen/Qwen3-4B`](https://huggingface.co/Qwen/Qwen3-4B) config is also included) |
 | Method | QLoRA, 4-bit quantisation |
 | LoRA rank / alpha / dropout | 8 / 16 / 0.05 |
 | Layer selection | Only the 50% of layers with the highest signal-to-noise ratio are adapted |
@@ -146,8 +146,8 @@ print(pipeline.get_response("What is the NUST Asaan Account?"))
 
 | Setting | Default |
 |---|---|
-| Embedding model | `BAAI/bge-large-en-v1.5` |
-| LLM | `meta-llama/Llama-3.2-3B-Instruct` |
+| Embedding model | [`BAAI/bge-large-en-v1.5`](https://huggingface.co/BAAI/bge-large-en-v1.5) |
+| LLM | [`meta-llama/Llama-3.2-3B-Instruct`](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct) |
 | Documents retrieved per search | 4 |
 | Max new tokens / temperature | 512 / 0.7 |
 
