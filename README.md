@@ -1,219 +1,155 @@
-# NUST Bank RAG System
+# NUST BankLlama: Banking Assistant with Hybrid RAG and QLoRA Fine-Tuning
 
-A production-ready Retrieval-Augmented Generation (RAG) system for banking information retrieval and question answering.
+A question-answering assistant for NUST Bank's products and services. It combines **hybrid retrieval** (dense vectors + BM25 keyword search) over the bank's own documents with a **Llama 3.2-3B** model, wraps every query and answer in **safety guardrails**, and includes a **QLoRA fine-tuned** variant of the model, *BankLlama-3B*, trained on a banking Q&A dataset built from the same documents.
 
-## Architecture Overview
+<p>
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white">
+  <img alt="LangChain" src="https://img.shields.io/badge/LangChain-RAG-1C3C3C">
+  <img alt="Qdrant" src="https://img.shields.io/badge/Qdrant-vector%20store-DC244C">
+  <img alt="Llama 3.2" src="https://img.shields.io/badge/Llama%203.2-3B-0467DF">
+  <img alt="Streamlit" src="https://img.shields.io/badge/Streamlit-app-FF4B4B?logo=streamlit&logoColor=white">
+</p>
 
-### 1. Data Preprocessing (`preprocessing/excel_chunker.py`)
+---
 
-- **Purpose**: Processes Excel files containing banking information into optimized chunks for retrieval
-- **Key Features**:
-  - Multiple chunking strategies:
-    - Character-based chunking
-    - Header-based chunking
-    - Q&A pair extraction
-  - Table preservation
-  - Markdown formatting support
-  - JSON export capability
-#### Alpaca Format Dataset for finetuning: https://huggingface.co/datasets/Areeb-02/banking-qa-dataset
-### 2. Retrieval System (`retriever.py`)
+## What it does
 
-- **Purpose**: Implements a hybrid retrieval system combining multiple search strategies
-- **Components**:
-  - FAISS vector store for semantic search
-  - BM25 for keyword-based search
-  - Cohere reranking for result optimization
-- **Features**:
-  - Weighted ensemble retrieval
-  - Persistent vector store
-  - Context compression
+A customer types a question such as *"What are the requirements for a personal loan?"*. The assistant:
 
-### 3. RAG Pipeline (`rag_pipeline.py`)
+1. **Checks the question** for jailbreak attempts and toxic language before anything else runs.
+2. **Retrieves** the most relevant passages from the bank's product documents using two complementary searches: semantic (meaning) and BM25 (exact terms like product names and fees).
+3. **Answers** with Llama 3.2-3B, instructed to use only the retrieved context and to say *"I don't know"* when the answer is not in the documents, rather than inventing one.
+4. **Checks the answer** with the same guardrails before showing it.
 
-- **Purpose**: Orchestrates the end-to-end RAG process
-- **Features**:
-  - Document ingestion
-  - Query processing
-  - LLM integration (Hugging Face)
-  - Error handling
-  - Response generation
+Staff can also upload new PDF, Word or text documents from the sidebar; they are chunked and added to the knowledge base on the spot.
 
-## Setup Instructions
+## How it works
 
-### 1. Environment Setup
+```mermaid
+flowchart LR
+    subgraph Ingestion
+        A[Bank documents<br/>Excel, DOCX, PDF, TXT] --> B[Chunking<br/>by header, Q&A pair<br/>or character]
+        B --> C[(Qdrant<br/>dense vectors<br/>bge-large-en-v1.5)]
+        B --> D[(BM25<br/>keyword index)]
+    end
+
+    Q[User question] --> G1{Input guardrail<br/>jailbreak + toxicity}
+    G1 -- blocked --> X[Ask user to rephrase]
+    G1 -- passed --> R[Hybrid retriever<br/>50% dense + 50% BM25]
+    C --> R
+    D --> R
+    R --> P[Grounded prompt<br/>answer only from context,<br/>else say I don't know]
+    P --> L[Llama 3.2-3B-Instruct]
+    L --> G2{Output guardrail}
+    G2 -- passed --> ANS[Answer]
+    G2 -- blocked --> X
+```
+
+### Why hybrid retrieval?
+
+Banking questions mix **meaning** ("how do I send money abroad?") with **exact terms** ("NUST Asaan Account", fee amounts, form names). Dense embeddings handle the first; BM25 handles the second. The two retrievers are combined with equal weights (LangChain `EnsembleRetriever`), so a passage that matches either way can reach the model.
+
+## Fine-tuning: BankLlama-3B
+
+Alongside the RAG system, the base model was fine-tuned on a banking Q&A dataset (Alpaca format) built from the same documents (`preprocessing/SFT_banking_qa_formatter.py`).
+
+```mermaid
+flowchart LR
+    D1[Bank product documents] --> D2[Extract Q&A pairs]
+    D2 --> D3[Banking QA dataset<br/>Alpaca format]
+    M[Llama 3.2-3B-Instruct] --> S[Signal-to-noise analysis<br/>per layer]
+    S --> T[Select top 50% of layers<br/>by SNR]
+    D3 --> F[QLoRA fine-tuning<br/>4-bit, rank 8<br/>Axolotl]
+    T --> F
+    F --> O[BankLlama-3B]
+```
+
+| Setting | Value |
+|---|---|
+| Base model | `meta-llama/Llama-3.2-3B-Instruct` (a Qwen3-4B config is also included) |
+| Method | QLoRA, 4-bit quantisation |
+| LoRA rank / alpha / dropout | 8 / 16 / 0.05 |
+| Layer selection | Only the 50% of layers with the highest signal-to-noise ratio are adapted |
+| Epochs / learning rate | 4 / 2e-5 |
+| Batch size | 2 per device, 8 effective (gradient accumulation) |
+| Sequence length | 4,000 tokens |
+| Training framework | [Axolotl](https://github.com/axolotl-ai-cloud/axolotl) (configs in `sft/axolotl-config/`) |
+
+**Why select layers by signal-to-noise ratio?** Not every layer of a pretrained model benefits equally from fine-tuning. Measuring each layer's signal-to-noise ratio and adapting only the most informative half cuts the number of trained parameters and the training time, while concentrating learning where it matters. The per-layer SNR results are in `sft/snr_results_*`.
+
+Model card and usage: [`sft/README.md`](sft/README.md).
+
+## Repository structure
+
+```
+├── app.py                         # Streamlit chat interface with document upload
+├── rag_pipeline.py                # Retrieval + prompt + LLM orchestration
+├── retriever.py                   # Hybrid retriever (Qdrant dense + BM25)
+├── hf_inference_client_embeddings.py  # Embeddings through the Hugging Face Inference API
+├── guardrail/                     # Input and output safety checks (Guardrails AI)
+├── preprocessing/
+│   ├── excel_chunker.py           # Header, Q&A-pair and character chunking
+│   ├── SFT_banking_qa_formatter.py  # Builds the fine-tuning dataset
+│   └── push_to_huggingface.py     # Publishes the dataset
+├── sft/                           # Fine-tuning configs, SNR layer analysis, model card
+├── rag/RAG_bank_nust.ipynb        # Exploratory RAG notebook
+├── dataset/ , data/               # Source bank documents
+└── config.py                      # Models, retrieval and generation settings
+```
+
+## Running it
+
+**1. Install**
 
 ```bash
-# Clone the repository
-git clone [repository-url]
-cd [repository-name]
-
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+git clone https://github.com/AreebAhmad-02/Financial-banking-rag-finetuning.git
+cd Financial-banking-rag-finetuning
+python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Configuration
-
-Create a `.env` file in the root directory:
+**2. Configure.** Copy `example.env` to `.env` and fill in:
 
 ```env
-HUGGINGFACEHUB_API_TOKEN=your_token_here
-HUGGINGFACE_API_URL=your_endpoint_url_here
-COHERE_API_KEY=your_key_here
+HUGGINGFACEHUB_API_TOKEN=...   # embeddings + LLM through Hugging Face Inference
+QDRANT_HOST=...                # Qdrant Cloud cluster URL
+QDRANT_API_KEY=...
+QDRANT_COLLECTION_NAME=banking_docs
 ```
 
-## Usage Guide
+**3. Install the guardrail validators**
 
-### 1. Data Preparation
-
-Place your Excel files in the `data` directory. The system expects banking-related information in a structured format.
-
-### 2. Document Processing
-
-```python
-from preprocessing.excel_chunker import process_excel_file
-
-# Process Excel file
-chunks = process_excel_file(
-    excel_file="data/banking_info.xlsx",
-    chunk_method="character",  # or "qa_pairs" or "header"
-    chunk_size=1000,
-    chunk_overlap=200
-)
+```bash
+guardrails configure
+guardrails hub install hub://guardrails/detect_jailbreak
+guardrails hub install hub://guardrails/toxic_language
 ```
 
-### 3. Running the RAG Pipeline
+**4. Start the app**
+
+```bash
+streamlit run app.py
+```
+
+Or use the pipeline directly from Python:
 
 ```python
 from rag_pipeline import create_rag_pipeline
 
-# Initialize pipeline
-pipeline = create_rag_pipeline(hf_api_url="your_hf_endpoint")
-
-# Ingest documents
-pipeline.ingest_documents(
-    excel_file="data/banking_info.xlsx",
-    chunk_method="character"
-)
-
-# Query the system
-response = pipeline.get_response("What is the NUST Asaan Account?")
+pipeline = create_rag_pipeline()
+pipeline.ingest_documents(json_file="chunks/header/all_chunks.json")
+print(pipeline.get_response("What is the NUST Asaan Account?"))
 ```
 
-## Chunking Methods
+## Key settings (`config.py`)
 
-### 1. Character-based Chunking
+| Setting | Default |
+|---|---|
+| Embedding model | `BAAI/bge-large-en-v1.5` |
+| LLM | `meta-llama/Llama-3.2-3B-Instruct` |
+| Documents retrieved per search | 4 |
+| Max new tokens / temperature | 512 / 0.7 |
 
-- Best for general text
-- Configurable chunk size and overlap
-- Preserves local context
+## Author
 
-### 2. Header-based Chunking
-
-- Ideal for structured documents
-- Maintains document hierarchy
-- Preserves section relationships
-
-### 3. Q&A Pair Extraction
-
-- Perfect for FAQ-style content
-- Maintains question-answer relationships
-- Optimized for direct answers
-
-## Retrieval System Details
-
-### Hybrid Retrieval Architecture
-
-1. **Semantic Search (FAISS)**
-
-   - Uses HuggingFace embeddings
-   - Finds semantically similar content
-   - Configurable number of matches
-
-2. **Keyword Search (BM25)**
-
-   - Traditional keyword matching
-   - Handles exact matches well
-   - Complements semantic search
-
-3. **Reranking (Cohere)**
-   - Improves result relevance
-   - Configurable top-N selection
-   - Context-aware ranking
-
-## Configuration Options
-
-### 1. Model Configuration (`config.py`)
-
-```python
-EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
-TOP_K_MATCHES = 4
-RERANK_TOP_N = 2
-```
-
-### 2. Directory Structure
-
-```
-├── data/                  # Data storage
-├── preprocessing/         # Preprocessing modules
-├── vector_store/         # FAISS vector store
-├── config.py             # Configuration
-├── retriever.py          # Retrieval system
-├── rag_pipeline.py       # Main pipeline
-└── example.py            # Usage example
-```
-
-## Error Handling
-
-The system includes comprehensive error handling:
-
-- API connection errors
-- File processing errors
-- Query processing errors
-- LLM response errors
-
-## Best Practices
-
-1. **Data Preparation**
-
-   - Clean Excel files before processing
-   - Use consistent formatting
-   - Include metadata where possible
-
-2. **Query Optimization**
-
-   - Be specific with queries
-   - Consider chunk size for your use case
-   - Monitor and adjust retrieval weights
-
-3. **Production Deployment**
-   - Monitor API usage
-   - Implement rate limiting
-   - Regular vector store updates
-
-## References
-
-1. LangChain Documentation
-
-   - [Vector Stores](https://python.langchain.com/docs/modules/data_connection/vectorstores/)
-   - [Retrievers](https://python.langchain.com/docs/modules/data_connection/retrievers/)
-
-2. FAISS Documentation
-
-   - [Getting Started](https://github.com/facebookresearch/faiss/wiki/Getting-started)
-
-3. Cohere Documentation
-   - [Reranking Guide](https://docs.cohere.com/docs/reranking)
-
-## Contributing
-
-[Add contribution guidelines here]
-
-## License
-
-[Add license information here]
+**Areeb Ahmad Chaudhry**: [website](https://areebahmad-02.github.io) · [Google Scholar](https://scholar.google.com/citations?user=gaDnnFwAAAAJ) · [GitHub](https://github.com/AreebAhmad-02)
